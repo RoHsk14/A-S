@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Tailwind v4: dark mode variant */
+@variant dark (&:where(.dark, .dark *));
+
+/* ── PPSPY/Afro Spy Design System ──────────────────────────── */
+@theme {
+  /* ── Core Palette ───────────────────────────────────────── */
+  --color-bg-base: #F8FAFC;
+  /* light background */
+  --color-bg-card: #FFFFFF;
+  /* card surface */
+  --color-bg-elevated: #F1F5F9;
+  /* hover/active surface */
+  --color-border: #E2E8F0;
+  /* subtle border */
+  --color-border-hover: #CBD5E1;
+  /* border on hover */
+
+  /* Aliases kept for compat with existing code */
+  --color-obsidian: #F8FAFC;
+  --color-charcoal: #FFFFFF;
+  --color-charcoal-light: #F1F5F9;
+  --color-charcoal-border: #E2E8F0;
+
+  /* ── Accents ────────────────────────────────────────────── */
+  --color-orange-burnt: #FF4500;
+  --color-orange-burnt-dark: #CC3700;
+  --color-orange-burnt-light: #FF6A33;
+  --color-blue-accent: #3871FF;
+  --color-blue-accent-dark: #2558E0;
+  --color-blue-accent-light: #5A8FFF;
+  --color-gold: #FFD700;
+  --color-green-active: #3FB950;
+
+  /* ── Text ───────────────────────────────────────────────── */
+  --color-text-primary: #1E293B;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
+
+  /* ── Font ───────────────────────────────────────────────── */
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
+
+  /* ── Shadows ────────────────────────────────────────────── */
+  --shadow-orange-glow: 0 0 20px rgba(255, 69, 0, 0.25);
+  --shadow-orange-glow-lg: 0 0 40px rgba(255, 69, 0, 0.35);
+  --shadow-blue-glow: 0 0 20px rgba(56, 113, 255, 0.25);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* shadow-sm requested */
+  --shadow-card-hover: 0 0 0 1px #FF4500, 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* ── Gradients ──────────────────────────────────────────── */
+  --background-image-gradient-orange: linear-gradient(135deg, #FF4500, #FF6A33);
+  --background-image-gradient-blue: linear-gradient(135deg, #3871FF, #5A8FFF);
+  --background-image-gradient-dark: linear-gradient(180deg, #161B22 0%, #0F1115 100%);
+  --background-image-gradient-card: linear-gradient(180deg, transparent 30%, rgba(15, 17, 21, 0.97) 100%);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ── Base ──────────────────────────────────────────────────── */
+@layer base {
+  body {
+    background-color: var(--color-bg-base);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #161B22;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #30363D;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #FF4500;
+  }
+
+  ::selection {
+    background-color: rgba(255, 69, 0, 0.25);
+    color: #E6EDF3;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Utilities ─────────────────────────────────────────────── */
+@layer utilities {
+
+  /* Shimmer skeleton (Light Mode) */
+  .shimmer {
+    background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Glassmorphism — Light style */
+  .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .glass-dark {
+    background: rgba(248, 250, 252, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* 9:16 aspect ratio */
+  .aspect-9-16 {
+    aspect-ratio: 9 / 16;
+  }
+
+  /* Line clamps */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Glow text */
+  .text-glow-orange {
+    text-shadow: 0 0 16px rgba(255, 69, 0, 0.5);
+  }
+
+  .text-glow-blue {
+    text-shadow: 0 0 16px rgba(56, 113, 255, 0.5);
+  }
 }
