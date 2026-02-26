@@ -19,7 +19,8 @@ async function getAds(): Promise<AdWithStore[]> {
   const orFilter = `cta_link.ilike.*shopify*,cta_link.ilike.*youcan*`;
 
   // Fetch only active, ecommerce, >20days old
-  const fetchUrl = `${SUPABASE_URL}/rest/v1/ads?select=*&is_active=eq.true&started_at=lte.${dateStr}&or=(${orFilter})&order=started_at.desc&limit=100`;
+  // Note: Removed &limit=100 to fetch all active winners as requested
+  const fetchUrl = `${SUPABASE_URL}/rest/v1/ads?select=*&is_active=eq.true&started_at=lte.${dateStr}&or=(${orFilter})&order=started_at.desc`;
 
   const res = await fetch(fetchUrl, {
     headers: {

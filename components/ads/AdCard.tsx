@@ -70,27 +70,26 @@ export function AdCard({ ad, isFavorite, onToggleFavorite }: AdCardProps) {
 
     return (
         <div
-            className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+            className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => {
                 setIsHovered(false);
                 if (videoRef.current) videoRef.current.currentTime = 0;
             }}
         >
-            {/* Heart Button */}
-            <button
-                onClick={(e) => { e.stopPropagation(); onToggleFavorite(ad.id); }}
-                className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 hover:bg-white/60 transition-all shadow-sm"
-                aria-label="Toggle Favorite"
-            >
-                <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-white"}`} />
-            </button>
-
             {/* Media Preview (9:16) */}
             <div
                 ref={containerRef}
-                className="relative aspect-[9/16] bg-slate-900 overflow-hidden"
+                className="relative aspect-[9/16] overflow-hidden bg-slate-900"
             >
+                {/* Heart Button */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(ad.id); }}
+                    className="absolute right-3 top-3 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white backdrop-blur-md transition-all hover:bg-black/40 shadow-sm"
+                    aria-label="Toggle Favorite"
+                >
+                    <Heart className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : "text-white"}`} />
+                </button>
                 {ad.video_url ? (
                     <video
                         ref={videoRef}
