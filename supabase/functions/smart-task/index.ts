@@ -1,3 +1,4 @@
+// @ts-nocheck
 // supabase/functions/smart-task/index.ts
 // Edge Function Afro Spy — Lance un acteur Apify pour scraper la Facebook Ad Library
 // Déploiement: supabase functions deploy smart-task

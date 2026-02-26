@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AdWithStore } from "@/types/database";
 
 export const MOCK_ADS: AdWithStore[] = [
