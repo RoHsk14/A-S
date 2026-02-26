@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Target, Flame, Folder, Settings, Bot, Eye } from "lucide-react";
+import { Target, Flame, Folder, Settings, Bot } from "lucide-react";
 import { AdCounter } from "@/components/ads/AdCounter";
 import { MOCK_STATS } from "@/lib/mock-data";
+import { AfroSpyLogo } from "@/components/ui/AfroSpyLogo";
 
 const NAV_ITEMS = [
     { href: "/", label: "Winners", icon: Target, description: "Flux principal" },
@@ -28,9 +29,7 @@ export function Sidebar() {
             {/* ── Logo ─────────────────────────────────────── */}
             <div className="px-4 py-4 border-b border-slate-200">
                 <Link href="/" className="flex items-center gap-2.5 group">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-orange flex items-center justify-center shadow-orange-glow group-hover:shadow-orange-glow-lg transition-all">
-                        <Eye className="w-4 h-4 text-white" strokeWidth={2.5} />
-                    </div>
+                    <AfroSpyLogo className="w-9 h-9 shadow-orange-glow group-hover:shadow-orange-glow-lg transition-shadow" />
                     <div className="leading-tight">
                         <p className="text-sm font-black tracking-widest text-text-primary">
                             AFRO <span className="text-orange-burnt">SPY</span>
@@ -56,8 +55,8 @@ export function Sidebar() {
                         >
                             <Link href={item.href}>
                                 <div className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all duration-150 group ${isActive
-                                        ? "bg-orange-burnt/10 border border-orange-burnt/25"
-                                        : "border border-transparent hover:bg-slate-100 hover:border-slate-300"
+                                    ? "bg-orange-burnt/10 border border-orange-burnt/25"
+                                    : "border border-transparent hover:bg-slate-100 hover:border-slate-300"
                                     }`}>
                                     {isActive && (
                                         <motion.div
@@ -66,8 +65,8 @@ export function Sidebar() {
                                         />
                                     )}
                                     <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 transition-colors ${isActive
-                                            ? "bg-orange-burnt/20 text-orange-burnt"
-                                            : "text-text-muted group-hover:text-text-secondary"
+                                        ? "bg-orange-burnt/20 text-orange-burnt"
+                                        : "text-text-muted group-hover:text-text-secondary"
                                         }`}>
                                         <Icon className="w-3.5 h-3.5" strokeWidth={2} />
                                     </div>
