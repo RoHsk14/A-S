@@ -52,13 +52,21 @@ function WinnerGridSkeleton() {
   );
 }
 
+import { createClient } from "@supabase/supabase-js";
+
+async function getFavorites() {
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummyproject.supabase.co";
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy_key";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+  const { data: favorites } = await supabase.from("favorites").select("ad_id");
+  return favorites?.map(f => f.ad_id) || [];
+}
+
 // ── Server component ─────────────────────────────────────────
 async function WinnersContent() {
   const ads = await getAds();
-
-  const supabase = await createClient();
-  const { data: favorites } = await supabase.from("favorites").select("ad_id");
-  const favoriteIds = favorites?.map(f => f.ad_id) || [];
+  const favoriteIds = await getFavorites();
 
   return <WinnerGrid ads={ads} initialFavoriteIds={favoriteIds} />;
 }

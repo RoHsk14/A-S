@@ -1,15 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { SpyListGrid } from "@/components/ads/SpyListGrid";
 import { AdWithStore } from "@/types/database";
 
 export default async function SpyListPage() {
-    const supabase = await createClient();
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummyproject.supabase.co";
+    const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy_key";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     // Fetch favorites and join with ads table
-    // Using service role key because RLS is likely not fully set up for anonymous users,
-    // or we can just use the standard client which uses anon key.
-    // The previous implementation of `useFavorites` uses the client component `createClient` (anon), 
-    // Which means anyone can insert/delete. We should be able to read.
+    // Bypassing RLS with service key so the unauthenticated MVP works globally
     const { data: favorites, error } = await supabase
         .from("favorites")
         .select(`

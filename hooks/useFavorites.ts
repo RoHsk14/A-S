@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { toggleFavoriteAction } from "@/app/actions/favorites";
 
 export function useFavorites(initialFavoriteIds: string[] = []) {
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(
@@ -34,20 +34,7 @@ export function useFavorites(initialFavoriteIds: string[] = []) {
             setPendingIds((prev) => new Set(prev).add(adId));
 
             try {
-                const supabase = createClient();
-
-                if (wasFavorited) {
-                    // Remove from favorites
-                    await supabase
-                        .from("favorites")
-                        .delete()
-                        .eq("ad_id", adId);
-                } else {
-                    // Add to favorites
-                    await supabase
-                        .from("favorites")
-                        .insert({ ad_id: adId });
-                }
+                await toggleFavoriteAction(adId, !wasFavorited);
             } catch (error) {
                 console.warn("Failed to sync favorite, reverting:", error);
                 // Revert optimistic update on error
