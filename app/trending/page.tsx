@@ -68,16 +68,16 @@ export default async function TrendingPage() {
     const stores = await getTrendingStores();
 
     return (
-        <div className="p-6">
+        <div>
             <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">🔥</span>
                 <h1 className="text-2xl font-bold text-text-primary tracking-tight">Trending</h1>
             </div>
-            <p className="text-sm text-text-muted ml-9 mb-6">
+            <p className="text-sm text-text-muted mb-6 sm:ml-9">
                 Boutiques qui scalent agressivement en ce moment
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-4 sm:mt-6">
                 {stores.map((store, index) => (
                     <div
                         key={store.domain}

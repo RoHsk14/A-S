@@ -43,7 +43,7 @@ async function getAds(): Promise<AdWithStore[]> {
 function WinnerGridSkeleton() {
   return (
     <div>
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {Array.from({ length: 10 }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -52,12 +52,12 @@ function WinnerGridSkeleton() {
   );
 }
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 async function getFavorites() {
   const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummyproject.supabase.co";
   const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy_key";
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+  const supabase = createSupabaseClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
   const { data: favorites } = await supabase.from("favorites").select("ad_id");
   return favorites?.map(f => f.ad_id) || [];
@@ -85,8 +85,8 @@ export default async function WinnersPage() {
   const newThisWeek = 0;
 
   return (
-    <div className="flex flex-col min-h-full bg-slate-50">
-      <div className="px-6 pt-6 pb-6 border-b border-slate-200 bg-white">
+    <div className="flex flex-col min-h-full">
+      <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           <span className="text-2xl">🏆</span>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -96,12 +96,12 @@ export default async function WinnersPage() {
             Live Database
           </span>
         </div>
-        <p className="text-sm text-slate-500 ml-9 mb-6">
+        <p className="text-sm text-slate-500 mb-6 sm:ml-9">
           Intelligence de marché 100% Africaine — Les publicités vérifiées qui scalent.
         </p>
 
         {/* KPI Header */}
-        <div className="grid grid-cols-3 gap-4 ml-9 items-start max-w-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:ml-9 items-start max-w-2xl">
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-orange-600" />

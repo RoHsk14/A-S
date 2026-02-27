@@ -18,7 +18,7 @@ export function SpyListGrid({ initialAds }: SpyListGridProps) {
     const favoriteAds = initialAds.filter((ad) => favoriteIds.has(ad.id));
 
     return (
-        <div className="p-6">
+        <div>
             <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">📁</span>
                 <h1 className="text-2xl font-bold text-text-primary tracking-tight">Spy List</h1>
@@ -26,7 +26,7 @@ export function SpyListGrid({ initialAds }: SpyListGridProps) {
                     {favoriteAds.length} sauvegardé{favoriteAds.length !== 1 ? "s" : ""}
                 </span>
             </div>
-            <p className="text-sm text-text-muted ml-9 mb-6">
+            <p className="text-sm text-text-muted mb-6 sm:ml-9">
                 Vos pubs favorites — sauvegardées pour analyse
             </p>
 
@@ -43,7 +43,7 @@ export function SpyListGrid({ initialAds }: SpyListGridProps) {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mt-4 sm:mt-6">
                     <AnimatePresence mode="popLayout">
                         {favoriteAds.map((ad) => (
                             <AdCard

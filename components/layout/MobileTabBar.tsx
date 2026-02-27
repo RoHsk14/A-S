@@ -15,7 +15,7 @@ export function MobileTabBar() {
     const pathname = usePathname();
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-2 z-50 pb-safe">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-2 z-50 pb-safe">
             {MOBILE_NAV.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;

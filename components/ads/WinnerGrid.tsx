@@ -69,7 +69,7 @@ export function WinnerGrid({ ads, initialFavoriteIds = [] }: WinnerGridProps) {
         <div>
             <FilterBar filters={filters} onChange={setFilters} resultCount={filteredAds.length} />
 
-            <div className="p-6">
+            <div className="mt-4 sm:mt-6">
                 {filteredAds.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
                         <div className="w-16 h-16 rounded-2xl bg-charcoal-light border border-charcoal-border flex items-center justify-center mb-4">

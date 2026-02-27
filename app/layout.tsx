@@ -28,18 +28,18 @@ export default function RootLayout({
       <body className={`${inter.variable} bg-slate-50 text-text-primary antialiased`}>
         <ToastProvider />
         {/* Main Layout Wrapper */}
-        <div className="flex min-h-screen bg-slate-50 pb-[64px] md:pb-0">
+        <div className="flex min-h-screen bg-slate-50 pb-[64px] lg:pb-0">
 
           {/* Desktop Sidebar */}
-          <div className="hidden md:flex sticky top-0 h-screen">
+          <div className="hidden lg:flex sticky top-0 h-screen">
             <Sidebar />
           </div>
 
           {/* Main Content Area */}
-          <main className="flex-1 w-full overflow-x-hidden flex flex-col min-h-screen">
+          <main className="flex-1 w-full overflow-x-hidden relative flex flex-col min-h-screen max-w-full">
 
             {/* Mobile Header */}
-            <header className="md:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
+            <header className="lg:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-2">
                 <AfroSpyLogo className="w-8 h-8 shadow-sm" />
                 <h1 className="text-lg font-black tracking-tight text-slate-900">
@@ -49,7 +49,7 @@ export default function RootLayout({
             </header>
 
             {/* Page Content */}
-            <div className="flex-1">{children}</div>
+            <div className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">{children}</div>
 
             {/* Mobile Bottom Tab Bar */}
             <MobileTabBar />
