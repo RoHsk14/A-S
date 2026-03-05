@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xgxwasirqsetnnjstims.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy_key_for_build';
-const APIFY_TOKEN = process.env.APIFY_API_TOKEN || '';
+const APIFY_TOKEN = process.env.APIFY_TOKEN || process.env.APIFY_API_TOKEN || '';
 const ACTOR_ID = 'XtaWFhbtfxyzqrFmd'; // facebook-ads-library-scraper
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -15,13 +15,23 @@ function trendScore(startedAt: string, hasVideo: boolean) {
     return parseFloat(score.toFixed(3));
 }
 
+function sanitizeAdCopy(text: string): string {
+    if (!text) return '';
+    return text
+        .replace(/\{\{product\.brand\}\}/gi, '')
+        .replace(/\{\{product\.name\}\}/gi, 'ce produit')
+        .replace(/\{\{.*?\}\}/g, '') // Catch any other {{variable}}
+        .trim();
+}
+
 function mapItem(item: any) {
     const snap = item.snapshot || {};
     const videos = snap.videos || [];
     const images = snap.images || [];
 
     const pageName = snap.page_name || item.page_name || 'Page inconnue';
-    const body = snap.body?.text || snap.link_description || snap.title || '';
+    const rawBody = snap.body?.text || snap.link_description || snap.title || '';
+    const body = sanitizeAdCopy(rawBody);
     const videoUrl = videos[0]?.video_hd_url || videos[0]?.video_sd_url || null;
     const imageUrl = images[0]?.resized_image_url || images[0]?.original_image_url || snap.page_profile_picture_url || null;
     const ctaLink = snap.link_url || null;
@@ -112,7 +122,12 @@ export async function runScraper(
 
     let inserted = 0, skipped = 0;
 
-    for (const item of items.slice(0, limit)) {
+    logCallback(`🔄 Réinitialisation des anciens Winners de la semaine...`);
+    await supabase.from('ads').update({ is_winner_of_the_week: false, winner_week_date: null }).neq('id', '00000000-0000-0000-0000-000000000000'); // Dummy filter to update all
+
+    for (const item of items) {
+        if (inserted >= 20) break; // Strict limit: only 20 winners per scan
+
         const raw = mapItem(item);
 
         logCallback(`  🔍 "${raw.pageName}" | body:${raw.body.length}c | video:${!!raw.videoUrl}`);
@@ -134,13 +149,16 @@ export async function runScraper(
             is_active: true,
             started_at: raw.startedAt,
             trend_score: trendScore(raw.startedAt, !!raw.videoUrl),
+            country: country,
+            is_winner_of_the_week: true,
+            winner_week_date: new Date().toISOString()
         };
 
         const { error } = await supabase.from('ads').upsert(record, { onConflict: 'page_name,ad_copy' });
 
         if (!error) {
             inserted++;
-            logCallback(`  🚀 [${inserted}] "${record.page_name}" — score: ${record.trend_score}`);
+            logCallback(`  🚀 [${inserted}/20] Nouveau Winner: "${record.page_name}"`);
         } else {
             logCallback(`  ❌ Erreur Supabase pour "${record.page_name}": ${error.message}`);
         }
@@ -148,4 +166,16 @@ export async function runScraper(
 
     logCallback(`\n📊 Résumé : ${inserted} insérées, ${skipped} ignorées\n`);
     logCallback(`✅ Voir les run Apify : https://console.apify.com/actors/${ACTOR_ID}/runs/${runId}`);
+
+    // Log the real history
+    await supabase.from('scan_history').insert({
+        keyword: keyword,
+        country: country,
+        platform: platform || 'facebook',
+        status: 'success',
+        ads_extracted: inserted,
+        apify_run_id: runId
+    });
+
+    return { runId, inserted, skipped };
 }

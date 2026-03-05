@@ -1,0 +1,2 @@
+ALTER TABLE public.ads ADD COLUMN IF NOT EXISTS is_winner_of_the_week BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.ads ADD COLUMN IF NOT EXISTS winner_week_date TIMESTAMPTZ;

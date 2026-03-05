@@ -38,13 +38,20 @@ export interface AdWithStore extends Ad {
     store?: Store | null;
 }
 
-// ─── Favorites table ─────────────────────────────────────────
-export interface Favorite {
+// ─── Spy List table ─────────────────────────────────────────
+export interface SpyList {
     id: string;
     user_id: string;
     ad_id: string;
     created_at: string;
     ad?: AdWithStore;
+}
+
+// ─── User Profiles table ────────────────────────────────────
+export interface UserProfile {
+    id: string; // matches auth.users.id
+    market_preferences: string[]; // JSON array of country codes or names
+    created_at: string;
 }
 
 // ─── Filter state ────────────────────────────────────────────
@@ -54,4 +61,5 @@ export interface FilterState {
     age: "all" | "24h" | "7d" | "30d";
     platform: "all" | "facebook" | "instagram" | "tiktok";
     activeOnly: boolean;
+    africaFocus: boolean;
 }

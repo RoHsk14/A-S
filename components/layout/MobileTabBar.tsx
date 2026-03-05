@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Target, Flame, Folder, Bot } from "lucide-react";
+import { Target, Search, Folder, Store } from "lucide-react";
 
 const MOBILE_NAV = [
     { href: "/", label: "Winners", icon: Target },
-    { href: "/trending", label: "Trending", icon: Flame },
+    { href: "/scraper", label: "Search", icon: Search },
     { href: "/spy-list", label: "Spy List", icon: Folder },
-    { href: "/scraper", label: "Scraper", icon: Bot },
+    { href: "/my-stores", label: "My Stores", icon: Store },
 ];
 
 export function MobileTabBar() {

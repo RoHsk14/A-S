@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { Play, Search, Globe, Hash, ChevronDown, Loader2, Zap, CheckCircle2 } from "lucide-react";
+import { getScanHistory } from "@/app/actions/scan-history";
 
 
 // ── Countries ─────────────────────────────────────────────────
@@ -36,7 +37,7 @@ const PLATFORMS = [
     { value: "instagram", label: "📸 Instagram" },
 ];
 
-interface ScanResult { runId?: string; message?: string; }
+interface ScanResult { runId?: string; message?: string; status?: string; inserted?: number; skipped?: number; }
 
 export default function ScraperPage() {
     const [keyword, setKeyword] = useState("");
@@ -45,6 +46,24 @@ export default function ScraperPage() {
     const [platform, setPlatform] = useState("facebook");
     const [loading, setLoading] = useState(false);
     const [lastRun, setLastRun] = useState<ScanResult | null>(null);
+    const [history, setHistory] = useState<any[]>([]);
+
+    useEffect(() => {
+        getScanHistory().then(setHistory);
+    }, [lastRun]); // Reload history when a new run finishes
+
+    function timeAgo(dateString: string) {
+        if (!dateString) return '';
+        const diffMs = Date.now() - new Date(dateString).getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffDays > 0) return `Il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+        if (diffHours > 0) return `Il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+        if (diffMins > 0) return `Il y a ${diffMins} min`;
+        return "À l'instant";
+    }
 
     const handleStartScan = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -63,7 +82,7 @@ export default function ScraperPage() {
         const toastId = toast.loading(`⏳ Lancement du scan pour "${payload.keyword}"...`, {
             style: {
                 background: "#FFFFFF",
-                color: "#E6EDF3",
+                color: "#1E293B",
                 border: "1px solid #E2E8F0",
                 borderRadius: "12px",
             },
@@ -86,7 +105,7 @@ export default function ScraperPage() {
             setLastRun(result);
 
             toast.success(
-                `🚀 Scan lancé sur Apify ! Les résultats arrivent dans quelques minutes.`,
+                `🚀 Scan terminé ! ${result.inserted || 0} pépites enregistrées.`,
                 { id: toastId, duration: 5000 }
             );
 
@@ -104,7 +123,7 @@ export default function ScraperPage() {
             toast.error(
                 isNotDeployed
                     ? "⚠️ La Edge Function 'smart-task' n'est pas encore déployée. Lance : supabase functions deploy smart-task"
-                    : `❌ Erreur : ${err instanceof Error ? err.message : "Impossible de contacter la Edge Function."}`,
+                    : `❌ Erreur lors du scan : ${err instanceof Error ? err.message : "Erreur inconnue."}`,
                 { id: toastId, duration: 8000 }
             );
         } finally {
@@ -267,20 +286,69 @@ export default function ScraperPage() {
                     >
                         <CheckCircle2 className="w-5 h-5 text-green-active flex-shrink-0 mt-0.5" />
                         <div>
-                            <p className="text-sm font-semibold text-text-primary">Scan lancé avec succès !</p>
+                            <p className="text-sm font-semibold text-text-primary">Scan terminé avec succès !</p>
                             {lastRun.runId && (
-                                <p className="text-xs text-text-muted mt-0.5">
+                                <p className="text-xs text-text-muted mt-0.5 mb-1.5">
                                     Apify Run ID : <span className="font-mono text-blue-accent-light">{lastRun.runId}</span>
                                 </p>
                             )}
-                            <p className="text-xs text-text-muted mt-1">
-                                <Zap className="inline w-3 h-3 text-orange-burnt mr-1" />
-                                Les résultats apparaîtront dans la page Winners dans quelques minutes.
+                            <p className="text-xs text-text-muted mt-1 font-medium bg-slate-50 border border-slate-100 px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1.5">
+                                <Zap className="w-3.5 h-3.5 text-orange-burnt" />
+                                <span className="text-orange-burnt font-bold">{lastRun.inserted || 0}</span> publicités ont été validées et ajoutées au Winners feed.
                             </p>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* ── Historique des Scans ──────────────────────── */}
+            <div className="mt-12">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-slate-400" />
+                        Historique récent
+                    </h2>
+                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                        Dernier 24h
+                    </span>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                    {/* List Items */}
+                    <div className="divide-y divide-slate-100">
+                        {history.length === 0 ? (
+                            <div className="p-6 text-center text-slate-400 text-sm font-medium">
+                                Aucun scan enregistré pour l'instant.
+                            </div>
+                        ) : (
+                            history.map((scan) => (
+                                <div key={scan.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="text-sm font-bold text-slate-900">"{scan.keyword}"</h3>
+                                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                                {scan.country || "Global"}
+                                            </span>
+                                        </div>
+                                        <p className="text-[11px] font-medium flex items-center gap-1.5 text-slate-400">
+                                            <CheckCircle2 className={`w-3 h-3 ${scan.status === 'success' ? 'text-green-500' : 'text-slate-400'}`} />
+                                            <span className="capitalize">{scan.status}</span> • {timeAgo(scan.created_at)}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-100">
+                                            {scan.ads_extracted} pubs extraites
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+                <p className="text-[10px] text-center text-slate-400 font-medium mt-4">
+                    L'historique affiche uniquement les derniers scans valides (Top 20 retenus par filtre).
+                </p>
+            </div>
         </div>
     );
 }

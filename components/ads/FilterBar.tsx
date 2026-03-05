@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
-import { Search, Store, Clock, X, Radio } from "lucide-react";
+import { Search, Store, Clock, X, Radio, Globe } from "lucide-react";
 import { FilterState } from "@/types/database";
 
 interface FilterBarProps {
@@ -45,10 +45,11 @@ export function FilterBar({ filters, onChange, resultCount }: FilterBarProps) {
         filters.lander !== "all" ||
         filters.age !== "all" ||
         filters.platform !== "all" ||
-        filters.activeOnly;
+        filters.activeOnly ||
+        !filters.africaFocus;
 
     const resetAll = useCallback(() => {
-        onChange({ keyword: "", lander: "all", age: "all", platform: "all", activeOnly: false });
+        onChange({ keyword: "", lander: "all", age: "all", platform: "all", activeOnly: false, africaFocus: true });
     }, [onChange]);
 
     return (
@@ -129,12 +130,24 @@ export function FilterBar({ filters, onChange, resultCount }: FilterBarProps) {
                 <button
                     onClick={() => onChange({ ...filters, activeOnly: !filters.activeOnly })}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${filters.activeOnly
-                            ? "bg-green-500/15 border-green-500/30 text-green-400"
-                            : "bg-charcoal-light border-charcoal-border text-text-muted hover:text-text-secondary"
+                        ? "bg-green-500/15 border-green-500/30 text-green-400"
+                        : "bg-charcoal-light border-charcoal-border text-text-muted hover:text-text-secondary"
                         }`}
                 >
                     <Radio className="w-3.5 h-3.5" />
                     Live only
+                </button>
+
+                {/* Focus Afrique Toggle */}
+                <button
+                    onClick={() => onChange({ ...filters, africaFocus: !filters.africaFocus })}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${filters.africaFocus
+                        ? "bg-orange-burnt text-white border-orange-burnt shadow-orange-glow"
+                        : "bg-charcoal-light border-charcoal-border text-text-muted hover:text-text-secondary"
+                        }`}
+                >
+                    <Globe className="w-3.5 h-3.5" />
+                    Focus Afrique
                 </button>
 
                 {/* Reset */}

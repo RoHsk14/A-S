@@ -2,7 +2,9 @@
 
 import { useRef, useEffect, useState } from "react";
 import { Heart, Volume2, VolumeX, ExternalLink, Play } from "lucide-react";
+import Link from "next/link";
 import { AdWithStore } from "@/types/database";
+import { TrackStoreButton } from "@/components/ads/TrackStoreButton";
 
 interface AdCardProps {
     ad: AdWithStore;
@@ -21,7 +23,7 @@ function getHostname(url: string | null) {
 
 export function AdCard({ ad, isFavorite, onToggleFavorite }: AdCardProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLAnchorElement>(null);
 
     const [isIntersecting, setIsIntersecting] = useState(false);
     const [isMuted, setIsMuted] = useState(true);
@@ -77,14 +79,19 @@ export function AdCard({ ad, isFavorite, onToggleFavorite }: AdCardProps) {
                 if (videoRef.current) videoRef.current.currentTime = 0;
             }}
         >
-            {/* Media Preview (9:16) */}
-            <div
+            {/* Media Preview (Square) */}
+            <Link
+                href={`/ad/${ad.id}`}
                 ref={containerRef}
-                className="relative aspect-[9/16] overflow-hidden bg-slate-900"
+                className="relative aspect-square overflow-hidden bg-slate-900 block flex-shrink-0"
             >
                 {/* Heart Button */}
                 <button
-                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(ad.id); }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onToggleFavorite(ad.id);
+                    }}
                     className="absolute right-3 top-3 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white backdrop-blur-md transition-all hover:bg-black/40 shadow-sm"
                     aria-label="Toggle Favorite"
                 >
@@ -139,25 +146,19 @@ export function AdCard({ ad, isFavorite, onToggleFavorite }: AdCardProps) {
                         )}
                     </button>
                 )}
-            </div>
+            </Link>
 
             {/* SECTION INFOS (Light Mode) */}
             <div className="p-4 flex flex-col flex-grow bg-white">
                 <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {hostname ? (
-                            <img
-                                src={`https://logo.clearbit.com/${hostname}`}
-                                alt="store-logo"
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                            />
-                        ) : (
-                            <span className="text-[10px] font-bold text-slate-400">{ad.page_name?.[0]?.toUpperCase()}</span>
-                        )}
+                        <span className="text-sm font-bold text-slate-500">{ad.page_name?.[0]?.toUpperCase() || '?'}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 text-sm truncate">{ad.page_name}</h3>
+                        <div className="flex items-center justify-between gap-2">
+                            <h3 className="font-bold text-slate-900 text-sm truncate">{ad.page_name}</h3>
+                            <TrackStoreButton domain={hostname} pageName={ad.page_name} />
+                        </div>
                         <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Shopify Store</p>
                     </div>
                 </div>
@@ -166,24 +167,34 @@ export function AdCard({ ad, isFavorite, onToggleFavorite }: AdCardProps) {
                     "{ad.ad_copy}"
                 </p>
 
-                {/* Action Buttons - 44px min height for touch */}
-                <div className="mt-auto pt-4 border-t border-slate-100 flex gap-2">
-                    <a
-                        href={ad.cta_link ?? "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 min-h-[44px] flex items-center justify-center gap-2 bg-orange-600 text-white px-2 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold hover:bg-orange-700 transition-all active:scale-95 shadow-sm truncate"
-                    >
-                        VOIR LA BOUTIQUE <ExternalLink className="w-3 h-3 flex-shrink-0" />
-                    </a>
-                    <a
-                        href={ad.ad_archive_id ? `https://www.facebook.com/ads/library/?id=${ad.ad_archive_id}` : `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${encodeURIComponent(ad.page_name)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 min-h-[44px] flex items-center justify-center gap-2 bg-slate-50 text-slate-600 px-2 py-2.5 rounded-xl text-[11px] sm:text-xs font-semibold border border-slate-200 hover:bg-slate-100 transition-colors truncate"
-                    >
-                        Ads Library
-                    </a>
+                <div className="bg-orange-50/80 border border-orange-200/60 rounded-xl p-3 mb-5 flex gap-2 items-start mt-auto shadow-sm">
+                    <span className="text-[10px] leading-snug text-orange-900/90 font-medium text-left">
+                        <strong className="font-bold text-orange-700 block mb-0.5">⚠️ Attention</strong>
+                        Cette publicité quittera la sélection Winners dimanche soir. Enregistrez-la dans votre Spy-List pour ne pas la perdre.
+                    </span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-3 mt-auto border-t border-slate-100/50">
+                    <div className="grid grid-cols-2 gap-2">
+                        <a
+                            href={ad.cta_link ?? "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 group"
+                        >
+                            Boutique
+                            <ExternalLink className="w-3.5 h-3.5 text-orange-200 group-hover:text-white transition-colors" />
+                        </a>
+                        <a
+                            href={ad.ad_archive_id ? `https://www.facebook.com/ads/library/?id=${ad.ad_archive_id}` : `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${encodeURIComponent(ad.page_name)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 hover:border-slate-300 flex items-center justify-center py-3 rounded-xl text-xs font-bold transition-all shadow-sm"
+                        >
+                            Facebook
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

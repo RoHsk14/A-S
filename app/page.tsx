@@ -3,24 +3,21 @@ import { AdWithStore } from "@/types/database";
 import { WinnerGrid } from "@/components/ads/WinnerGrid";
 import { SkeletonCard } from "@/components/ads/SkeletonCard";
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUp, Sparkles, Store } from "lucide-react";
+import { TrendingUp, Sparkles, Store, Rocket, ShieldCheck, Zap, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { CountdownTimer } from "@/components/ads/CountdownTimer";
 
 // ── Data fetching from Supabase ──────────────────────────────
-async function getAds(): Promise<AdWithStore[]> {
+async function getAds(preferences: string[] = []): Promise<AdWithStore[]> {
   const SUPABASE_URL = "https://xgxwasirqsetnnjstims.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhneHdhc2lycXNldG5uanN0aW1zIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTgwNzUyOCwiZXhwIjoyMDg3MzgzNTI4fQ.9xT1K765h6X8saoXDN7pWdoEkuKt--HfRlgm5Fnnlcg";
 
-  // Calculate threshold date: 20 days ago
-  const date20DaysAgo = new Date();
-  date20DaysAgo.setDate(date20DaysAgo.getDate() - 20);
-  const dateStr = date20DaysAgo.toISOString().split('T')[0];
+  // strict "Winners of the Week" rule
+  let fetchUrl = `${SUPABASE_URL}/rest/v1/ads?select=*&is_winner_of_the_week=eq.true&order=winner_week_date.desc&limit=20`;
 
-  // African countries are natively enforced by Scraper rules so `started_at` and `cta_link` are enough
-  const orFilter = `cta_link.ilike.*shopify*,cta_link.ilike.*youcan*`;
-
-  // Fetch only active, ecommerce, >20days old
-  // Note: Removed &limit=100 to fetch all active winners as requested
-  const fetchUrl = `${SUPABASE_URL}/rest/v1/ads?select=*&is_active=eq.true&started_at=lte.${dateStr}&or=(${orFilter})&order=started_at.desc`;
+  if (preferences.length > 0) {
+    fetchUrl += `&country=in.(${preferences.join(',')})`;
+  }
 
   const res = await fetch(fetchUrl, {
     headers: {
@@ -52,29 +49,52 @@ function WinnerGridSkeleton() {
   );
 }
 
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+async function getMarketPreferences() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data: profile } = await supabase.from("user_profiles").select("market_preferences").eq("id", user.id).single();
+  return profile?.market_preferences || [];
+}
+
+import { StoreAnalysisBanner } from "@/components/ads/StoreAnalysisBanner";
 
 async function getFavorites() {
-  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummyproject.supabase.co";
-  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy_key";
-  const supabase = createSupabaseClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-  const { data: favorites } = await supabase.from("favorites").select("ad_id");
-  return favorites?.map(f => f.ad_id) || [];
+  const supabase = await createClient();
+  const { data: spyList } = await supabase.from("spy_list").select("ad_id");
+  return spyList?.map(f => f.ad_id) || [];
 }
 
 // ── Server component ─────────────────────────────────────────
-async function WinnersContent() {
-  const ads = await getAds();
+async function WinnersContent({ storeQuery }: { storeQuery?: string }) {
+  const preferences = await getMarketPreferences();
+  let ads = await getAds(preferences);
   const favoriteIds = await getFavorites();
 
-  return <WinnerGrid ads={ads} initialFavoriteIds={favoriteIds} />;
+  // If coming from the "My Stores" dashboard, filter ads by the specific store
+  if (storeQuery) {
+    const query = storeQuery.toLowerCase();
+    ads = ads.filter(ad =>
+      ad.page_name?.toLowerCase().includes(query) ||
+      ad.cta_link?.toLowerCase().includes(query)
+    );
+  }
+
+  return (
+    <>
+      {storeQuery && ads.length > 0 && (
+        <StoreAnalysisBanner storeDomain={storeQuery} adCopies={ads.map(a => a.ad_copy)} />
+      )}
+      <WinnerGrid ads={ads} initialFavoriteIds={favoriteIds} />
+    </>
+  );
 }
 
 // ── Page ─────────────────────────────────────────────────────
-export default async function WinnersPage() {
+async function WinnersDashboard({ storeQuery }: { storeQuery?: string }) {
   // We fetch counts directly or estimate. For UI purposes, we'll wait for the main ads array
-  const ads = await getAds();
+  const preferences = await getMarketPreferences();
+  const ads = await getAds(preferences);
   const totalWinners = ads.length;
 
   // Realistically, to get total stores we map unique page_names
@@ -82,7 +102,7 @@ export default async function WinnersPage() {
 
   // New in 7 days could be calculated differently but since these are all >20 days old, "0" is technically accurate 
   // unless we mean "newly detected winners this week" which is distinct from "ad launch date".
-  const newThisWeek = 0;
+  const newThisWeek = ads.length;
 
   return (
     <div className="flex flex-col min-h-full">
@@ -93,12 +113,21 @@ export default async function WinnersPage() {
             Winners
           </h1>
           <span className="text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full uppercase tracking-wider">
-            Live Database
+            Sélection Hebdomadaire
           </span>
+          {storeQuery && (
+            <span className="text-xs font-bold bg-slate-900 text-white px-2.5 py-1 rounded-full ml-auto shadow-sm">
+              Focus : {storeQuery}
+            </span>
+          )}
         </div>
-        <p className="text-sm text-slate-500 mb-6 sm:ml-9">
+        <p className="text-sm text-slate-500 mb-4 sm:ml-9">
           Intelligence de marché 100% Africaine — Les publicités vérifiées qui scalent.
         </p>
+
+        <div className="sm:ml-9 mb-6">
+          <CountdownTimer text={`Sélection de la semaine : ${ads.length} pépites`} />
+        </div>
 
         {/* KPI Header */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:ml-9 items-start max-w-2xl">
@@ -133,8 +162,84 @@ export default async function WinnersPage() {
       </div>
 
       <Suspense fallback={<WinnerGridSkeleton />}>
-        <WinnersContent />
+        <WinnersContent storeQuery={storeQuery} />
       </Suspense>
     </div>
   );
+}
+
+function LandingPage() {
+  return (
+    <div className="bg-[#F8FAFC] min-h-screen font-sans">
+      {/* Navigation Rapide */}
+      <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="bg-orange-600 text-white p-2 rounded-lg font-bold text-xl">A-S</div>
+          <span className="text-xl font-black text-slate-900 tracking-tighter">Afro Spy</span>
+        </div>
+        <Link href="/login" className="text-slate-600 font-semibold hover:text-orange-600 transition">
+          Se connecter
+        </Link>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="max-w-4xl mx-auto text-center py-20 px-6">
+        <span className="bg-orange-100 text-orange-700 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">
+          L'outil n°1 pour l'E-commerce en Afrique
+        </span>
+        <h1 className="text-5xl md:text-7xl font-black text-slate-900 mt-6 mb-8 leading-[1.1]">
+          Espionnez les publicités qui <span className="text-orange-600">vendent vraiment.</span>
+        </h1>
+        <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
+          Ne perdez plus d'argent en tests inutiles. Accédez instantanément aux produits qui tournent depuis plus de 20 jours sur le marché africain.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/register" className="bg-orange-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-orange-200 hover:scale-105 transition-all flex items-center justify-center gap-2">
+            Commencer maintenant <ArrowRight className="w-5 h-5" />
+          </Link>
+          <Link href="#features" className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all">
+            Voir la démo
+          </Link>
+        </div>
+      </header>
+
+      {/* Features Section */}
+      <section id="features" className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 px-6 py-20">
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="bg-orange-100 p-3 w-fit rounded-2xl mb-6"><Zap className="text-orange-600" /></div>
+          <h3 className="text-xl font-bold mb-3 text-slate-900">Scan Cloud Automatique</h3>
+          <p className="text-slate-500 text-sm leading-relaxed">Nos serveurs analysent la bibliothèque publicitaire Facebook 24h/24 pour vous extraire les meilleures opportunités.</p>
+        </div>
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="bg-blue-100 p-3 w-fit rounded-2xl mb-6"><ShieldCheck className="text-blue-600" /></div>
+          <h3 className="text-xl font-bold mb-3 text-slate-900">Algorithme "Winner"</h3>
+          <p className="text-slate-500 text-sm leading-relaxed">Nous filtrons les pubs actives depuis plus de 20 jours. Si ça tourne encore, c'est que c'est rentable.</p>
+        </div>
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="bg-green-100 p-3 w-fit rounded-2xl mb-6"><Rocket className="text-green-600" /></div>
+          <h3 className="text-xl font-bold mb-3 text-slate-900">Focus Marché Africain</h3>
+          <p className="text-slate-500 text-sm leading-relaxed">Sénégal, Côte d'Ivoire, Tchad, Maghreb... Accédez aux données précises de votre marché local.</p>
+        </div>
+      </section>
+
+      {/* Footer simple */}
+      <footer className="py-10 text-center text-slate-400 text-sm border-t border-slate-200">
+        © 2026 Afro Spy (A-S). Tous droits réservés.
+      </footer>
+    </div>
+  );
+}
+
+export default async function Page(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const searchParams = await props.searchParams;
+  const storeQuery = typeof searchParams.store === 'string' ? searchParams.store : undefined;
+
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session) {
+    return <WinnersDashboard storeQuery={storeQuery} />;
+  }
+
+  return <LandingPage />;
 }

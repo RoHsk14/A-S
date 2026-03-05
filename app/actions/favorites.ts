@@ -1,20 +1,20 @@
 "use server";
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummyproject.supabase.co";
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy_key";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
 export async function toggleFavoriteAction(adId: string, isFavoriting: boolean) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error("Unauthorized");
+    }
+
     if (isFavoriting) {
-        // Insert (bypass RLS)
-        await supabase.from("favorites").insert({ ad_id: adId });
+        await supabase.from("spy_list").insert({ ad_id: adId, user_id: user.id });
     } else {
-        // Delete (bypass RLS)
-        await supabase.from("favorites").delete().eq("ad_id", adId);
+        await supabase.from("spy_list").delete().eq("ad_id", adId).eq("user_id", user.id);
     }
 
     // Refresh the Spy List cache

@@ -1,15 +1,16 @@
 import { Bell, Shield, Globe, ChevronRight } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { PreferencesForm } from "@/components/settings/PreferencesForm";
 
 const SETTINGS_SECTIONS = [
     {
-        title: "Préférences",
+        title: "Préférences Générales",
         icon: Globe,
         color: "text-amber-600",
         bg: "bg-amber-100",
         border: "border-amber-200",
         items: [
             { label: "Langue", value: "Français", type: "select" },
-            { label: "Région par défaut", value: "Afrique", type: "select" },
         ],
     },
     {
@@ -36,18 +37,33 @@ const SETTINGS_SECTIONS = [
     },
 ];
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("market_preferences")
+        .eq("id", user?.id)
+        .single();
+
+    const marketPreferences = profile?.market_preferences || [];
+
     return (
         <div className="p-6 max-w-2xl">
             <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">⚙️</span>
-                <h1 className="text-2xl font-bold text-text-primary tracking-tight">Settings</h1>
+                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Settings</h1>
             </div>
             <p className="text-sm text-text-muted ml-9 mb-8">
                 Configurez votre plateforme Afro Spy
             </p>
 
-            <div className="space-y-4">
+            <div className="mb-8 ml-9">
+                <PreferencesForm initialPreferences={marketPreferences} />
+            </div>
+
+            <div className="space-y-4 ml-9">
                 {SETTINGS_SECTIONS.map((section) => {
                     const Icon = section.icon;
                     return (

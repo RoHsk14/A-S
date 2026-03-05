@@ -19,6 +19,7 @@ export function WinnerGrid({ ads, initialFavoriteIds = [] }: WinnerGridProps) {
         age: "all",
         platform: "all",
         activeOnly: false,
+        africaFocus: true,
     });
 
     const { isFavorite, toggleFavorite } = useFavorites(initialFavoriteIds);
