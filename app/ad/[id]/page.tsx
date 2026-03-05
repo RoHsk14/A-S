@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import { AdWithStore } from "@/types/database";
-import { ExternalLink, Play, Download, ArrowLeft, Store, TrendingUp, Box, Sparkles, Globe2, Eye, CircleDollarSign } from "lucide-react";
+import { ExternalLink, Lock, Store, Target, Globe2, Eye, CircleDollarSign, Download, Box, Sparkles, TrendingUp, Cpu, LayoutTemplate, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { AdCard } from "@/components/ads/AdCard";
 import { SpyListGrid } from "@/components/ads/SpyListGrid";
@@ -142,8 +142,8 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
 
                         <div className="grid gap-6 mb-12">
                             {/* Ads Details Card */}
-                            <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6">
-                                <div className="flex items-center gap-2 mb-6 text-slate-900 font-bold text-lg">
+                            <div className="bg-white rounded-[20px] sm:rounded-[24px] shadow-sm border border-slate-200 p-4 sm:p-6">
+                                <div className="flex items-center justify-center sm:justify-start gap-2 mb-5 sm:mb-6 text-slate-900 font-bold text-lg">
                                     <Globe2 className="w-5 h-5 text-slate-400" />
                                     Ads Details
                                 </div>
@@ -161,29 +161,49 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
                                             </div>
                                         )}
                                     </div>
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-slate-500 flex items-center gap-2"><Globe2 className="w-4 h-4" /> Running time</span>
-                                            <span className="font-semibold text-slate-900">{formattedStartDate} → {ad.is_active ? 'Today' : 'Ended'}</span>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center justify-between py-2 sm:py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors">
+                                            <div className="flex items-center gap-3 text-slate-500">
+                                                <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                                    <Target className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-sm font-medium">Running time</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-900">{formattedStartDate} → Today</span>
                                         </div>
-                                        <div className="h-px w-full bg-slate-100" />
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-slate-500 flex items-center gap-2"><Eye className="w-4 h-4" /> Reach</span>
-                                            <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                                                <div className="w-3 h-3 rounded-full bg-indigo-400" />
+
+                                        <div className="flex items-center justify-between py-2 sm:py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors">
+                                            <div className="flex items-center gap-3 text-slate-500">
+                                                <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                                    <Eye className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-sm font-medium">Reach</span>
+                                            </div>
+                                            <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
                                             </div>
                                         </div>
-                                        <div className="h-px w-full bg-slate-100" />
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-slate-500 flex items-center gap-2"><CircleDollarSign className="w-4 h-4" /> Spend</span>
-                                            <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                                                <div className="w-3 h-3 rounded-full bg-indigo-400" />
+
+                                        <div className="flex items-center justify-between py-2 sm:py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors">
+                                            <div className="flex items-center gap-3 text-slate-500">
+                                                <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                                    <CircleDollarSign className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-sm font-medium">Spend</span>
+                                            </div>
+                                            <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
                                             </div>
                                         </div>
-                                        <div className="h-px w-full bg-slate-100" />
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-slate-500 flex items-center gap-2"><Globe2 className="w-4 h-4" /> Countries</span>
-                                            <span className="font-semibold text-slate-900">{ad.country || "-"}</span>
+
+                                        <div className="flex items-center justify-between py-2 sm:py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors">
+                                            <div className="flex items-center gap-3 text-slate-500">
+                                                <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                                    <Globe2 className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-sm font-medium">Countries</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-900">{ad.country || "CD"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -191,8 +211,8 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {/* Page Details */}
-                                <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
-                                    <div className="flex items-center gap-2 mb-6 text-slate-900 font-bold">
+                                <div className="bg-white rounded-[20px] sm:rounded-[24px] shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col justify-center">
+                                    <div className="flex items-center justify-center sm:justify-start gap-2 mb-6 text-slate-900 font-bold text-lg">
                                         <Store className="w-4 h-4 text-slate-400" />
                                         Page Details
                                     </div>
@@ -210,10 +230,10 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
                                 </div>
 
                                 {/* Shop Details - UNLOCKED */}
-                                <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="flex items-center gap-2 text-slate-900 font-bold">
-                                            <Store className="w-4 h-4 text-slate-400" />
+                                <div className="bg-white rounded-[20px] sm:rounded-[24px] shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col justify-between">
+                                    <div className="flex items-center justify-between mb-6 sm:mb-8">
+                                        <div className="flex items-center justify-center sm:justify-start gap-2 text-slate-900 font-bold text-lg">
+                                            <Store className="w-5 h-5 text-slate-400" />
                                             Shop Details
                                         </div>
                                         <div className="bg-orange-50 text-orange-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-orange-100">
@@ -221,40 +241,38 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                        {/* Simulated Insights */}
-                                        <div>
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Monthly Visits</p>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xl font-black text-slate-900">45.2K</span>
-                                                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                        <div className="space-y-5 sm:space-y-6 flex flex-col items-center sm:items-start text-center sm:text-left">
+                                            <div>
+                                                <h4 className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mb-1.5 sm:mb-2">MONTHLY VISITS</h4>
+                                                <div className="flex items-center justify-center sm:justify-start gap-2">
+                                                    <span className="text-2xl font-black text-slate-900">45.2K</span>
+                                                    <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div>
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Platform Details</p>
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <span className="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-slate-200">
-                                                    {ad.platform === 'facebook' || ad.platform === 'instagram' ? 'Shopify' : (ad.platform || 'Shopify')}
-                                                </span>
+                                            <div className="w-full flex flex-col items-center sm:items-start">
+                                                <h4 className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mb-2">PLATFORM DETAILS</h4>
+                                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 font-semibold text-xs">
+                                                    Shopify
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div>
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Tech Stack</p>
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <span className="bg-indigo-50 text-indigo-700 text-xs font-bold px-2 py-1 rounded-lg border border-indigo-100">
-                                                    Klaviyo
-                                                </span>
-                                                <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded-lg border border-blue-100">
-                                                    Meta Pixel
-                                                </span>
+                                            <div className="w-full flex flex-col items-center sm:items-start">
+                                                <h4 className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mb-2">TECH STACK</h4>
+                                                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                                                    <span className="bg-indigo-50 text-indigo-700 text-xs font-bold px-2 py-1 rounded-lg border border-indigo-100">
+                                                        Klaviyo
+                                                    </span>
+                                                    <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded-lg border border-blue-100">
+                                                        Meta Pixel
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
