@@ -21,6 +21,7 @@ export interface Ad {
     is_active: boolean | null;      // Still running?
     started_at: string | null;      // Date the ad started running (YYYY-MM-DD)
     created_at: string;             // When we scraped it
+    country?: string | null;        // Scraped targeting country
 }
 
 // ─── Stores table ────────────────────────────────────────────

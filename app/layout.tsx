@@ -21,8 +21,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   const supabase = await createClient();
   const { data: { session } } = await supabase.auth.getSession();
@@ -35,6 +37,7 @@ export default async function RootLayout({
         <AppShellNavigation isAuthenticated={isAuthenticated}>
           {children}
         </AppShellNavigation>
+        {modal}
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import { AdWithStore } from "@/types/database";
-import { ExternalLink, Play, Download, ArrowLeft, Store } from "lucide-react";
+import { ExternalLink, Play, Download, ArrowLeft, Store, TrendingUp, Box, Sparkles, Globe2, Eye, CircleDollarSign } from "lucide-react";
 import Link from "next/link";
 import { AdCard } from "@/components/ads/AdCard";
 import { SpyListGrid } from "@/components/ads/SpyListGrid";
@@ -15,27 +15,37 @@ async function getAd(id: string): Promise<AdWithStore | null> {
     return data as AdWithStore | null;
 }
 
-async function getSimilarAds(platform: string | null, currentId: string): Promise<AdWithStore[]> {
-    // For MVP, just fetch latest 4 active ads to act as 'similar stores'
-    const { data } = await supabase
+async function getStoreActiveAdsCount(pageName: string): Promise<number> {
+    const { count } = await supabase
         .from("ads")
-        .select("*")
-        .eq("is_active", true)
-        .neq("id", currentId)
-        .limit(4);
-    return (data || []) as AdWithStore[];
+        .select("*", { count: 'exact', head: true })
+        .eq("page_name", pageName)
+        .eq("is_active", true);
+    return count || 0;
 }
 
-export default async function AdDetailPage({ params }: { params: { id: string } }) {
+
+
+export default async function AdDetailPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const ad = await getAd(params.id);
 
     if (!ad) {
         notFound();
     }
 
-    const similarAds = await getSimilarAds(ad.platform, ad.id);
     const poster = ad.image_url ?? ad.thumbnail_url ?? "";
     const hostname = ad.cta_link ? new URL(ad.cta_link).hostname : null;
+
+    const activeAdsCount = await getStoreActiveAdsCount(ad.page_name || "");
+
+    const daysActive = ad.started_at
+        ? Math.floor((new Date().getTime() - new Date(ad.started_at).getTime()) / (1000 * 3600 * 24))
+        : 0;
+
+    const formattedStartDate = ad.started_at
+        ? new Date(ad.started_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+        : "Inconnu";
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50 relative pb-24 lg:pb-8">
@@ -50,55 +60,75 @@ export default async function AdDetailPage({ params }: { params: { id: string } 
             <div className="max-w-6xl mx-auto w-full p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
 
-                    {/* Colonne Gauche: Vidéo */}
+                    {/* Colonne Gauche: Full Card (Copied from Modal) */}
                     <div className="lg:col-span-5 h-fit sticky top-24">
-                        <div className="bg-slate-900 rounded-3xl overflow-hidden aspect-[9/16] relative shadow-2xl border border-slate-200">
-                            {ad.video_url ? (
-                                <video
-                                    src={ad.video_url}
-                                    poster={poster}
-                                    controls
-                                    autoPlay
-                                    loop
-                                    playsInline
-                                    className="w-full h-full object-contain"
-                                />
-                            ) : (
-                                <img src={poster} alt="Ad Thumbnail" className="w-full h-full object-cover" />
-                            )}
+                        <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                            {/* Header: Store Info */}
+                            <div className="p-5 pb-0 flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        <span className="text-lg font-bold text-slate-500">{ad.page_name?.[0]?.toUpperCase() || '?'}</span>
+                                    </div>
+                                    <div className="flex-1 min-w-0 pr-4">
+                                        <h3 className="font-bold text-slate-900 text-base truncate">{ad.page_name}</h3>
+                                        <p className="text-xs text-slate-500 font-medium">{ad.started_at ? new Date(ad.started_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : "Inconnu"}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <a
+                                        href={ad.cta_link ?? "#"}
+                                        target="_blank"
+                                        className="p-2 bg-white hover:bg-slate-50 rounded-lg text-slate-500 transition-colors border border-slate-200 shadow-sm"
+                                        title="Visiter la boutique"
+                                    >
+                                        <ExternalLink className="w-4 h-4" />
+                                    </a>
+                                    {ad.video_url && (
+                                        <a
+                                            href={ad.video_url}
+                                            download
+                                            target="_blank"
+                                            className="p-2 bg-white hover:bg-slate-50 rounded-lg text-slate-500 transition-colors border border-slate-200 shadow-sm"
+                                            title="Télécharger la vidéo"
+                                        >
+                                            <Download className="w-4 h-4" />
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Ad Copy */}
+                            <div className="px-5 mb-5">
+                                <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">
+                                    {ad.ad_copy || "Aucun texte détecté."}
+                                </p>
+                            </div>
+
+                            {/* Media */}
+                            <div className="relative w-full bg-[#09090b] flex items-center justify-center mt-auto">
+                                {ad.video_url ? (
+                                    <video
+                                        src={ad.video_url}
+                                        poster={poster}
+                                        controls
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        className="w-full max-h-[700px] object-contain"
+                                    />
+                                ) : (
+                                    <img src={poster} alt="Ad Thumbnail" className="w-full max-h-[700px] object-contain" />
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     {/* Colonne Droite: Détails */}
-                    <div className="lg:col-span-7 flex flex-col pt-2 lg:pt-8">
-                        {/* Header Infos */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden flex-shrink-0">
-                                <span className="text-2xl font-bold text-slate-500">{ad.page_name?.[0]?.toUpperCase() || '?'}</span>
-                            </div>
-                            <div>
-                                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{ad.page_name}</h1>
-                                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-1">
-                                    <Store className="w-4 h-4" /> Shopify Store
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Badges */}
-                        <div className="flex flex-wrap gap-2 mb-8">
-                            {ad.is_active && (
-                                <span className="bg-green-500/15 text-green-600 text-xs font-bold px-3 py-1.5 rounded-full border border-green-500/20">
-                                    🟢 Active Now
-                                </span>
-                            )}
-                            <span className="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-full">
-                                {ad.platform || "Facebook/Instagram"}
-                            </span>
-                        </div>
-
+                    <div className="lg:col-span-7 flex flex-col pt-2 lg:pt-0">
                         {/* Actions Principales */}
-                        <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                            {ad.cta_link && (
+                        {ad.cta_link && (
+                            <div className="mb-6 flex">
                                 <a
                                     href={ad.cta_link}
                                     target="_blank"
@@ -107,48 +137,121 @@ export default async function AdDetailPage({ params }: { params: { id: string } 
                                 >
                                     Analyser la Boutique <ExternalLink className="w-4 h-4" />
                                 </a>
-                            )}
-                            {ad.video_url && (
-                                <a
-                                    href={ad.video_url}
-                                    download={`ad_video_${ad.id}.mp4`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-1 min-h-[56px] flex items-center justify-center gap-2.5 bg-white text-slate-700 border-2 border-slate-200 px-6 rounded-2xl text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm"
-                                >
-                                    Télécharger Vidéo <Download className="w-4 h-4" />
-                                </a>
-                            )}
-                        </div>
-
-                        {/* Ad Copy */}
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-12">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Ad Copy Full Text</h3>
-                            <p className="text-slate-700 text-base leading-relaxed whitespace-pre-wrap font-medium">
-                                {ad.ad_copy || "Aucun texte détecté."}
-                            </p>
-                        </div>
-
-                        {/* Stores Similaires MVP */}
-                        <div>
-                            <div className="flex items-center gap-3 mb-6">
-                                <span className="text-xl">🔥</span>
-                                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Stores similaires</h2>
                             </div>
-                            <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
-                                {/* Since we need favorites context here, we can pass initial data to a client wrapper or render lightweight cards */}
-                                {similarAds.map(similar => (
-                                    <Link key={similar.id} href={`/ad/${similar.id}`} className="group relative rounded-2xl overflow-hidden border border-slate-200 aspect-[9/16] bg-slate-900 block">
-                                        {similar.video_url ? (
-                                            <video src={similar.video_url} poster={similar.image_url ?? similar.thumbnail_url ?? ""} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" muted loop playsInline onMouseEnter={e => e.currentTarget.play()} onMouseLeave={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }} />
+                        )}
+
+                        <div className="grid gap-6 mb-12">
+                            {/* Ads Details Card */}
+                            <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6">
+                                <div className="flex items-center gap-2 mb-6 text-slate-900 font-bold text-lg">
+                                    <Globe2 className="w-5 h-5 text-slate-400" />
+                                    Ads Details
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+                                    <div className="flex flex-col items-center justify-center bg-emerald-50/50 rounded-2xl p-6 border border-emerald-100/50">
+                                        <span className="text-4xl font-black text-slate-900 mb-1">{daysActive}</span>
+                                        <span className="text-sm font-medium text-slate-500 mb-4">Days running</span>
+                                        {ad.is_active ? (
+                                            <div className="bg-emerald-100 text-emerald-700 font-bold text-[10px] tracking-widest uppercase px-4 py-1.5 rounded-full flex items-center gap-1.5">
+                                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> STILL ACTIVE
+                                            </div>
                                         ) : (
-                                            <img src={similar.image_url ?? similar.thumbnail_url ?? ""} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                            <div className="bg-slate-200 text-slate-600 font-bold text-[10px] tracking-widest uppercase px-4 py-1.5 rounded-full">
+                                                INACTIVE
+                                            </div>
                                         )}
-                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                                            <p className="text-white font-bold text-sm truncate">{similar.page_name}</p>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-slate-500 flex items-center gap-2"><Globe2 className="w-4 h-4" /> Running time</span>
+                                            <span className="font-semibold text-slate-900">{formattedStartDate} → {ad.is_active ? 'Today' : 'Ended'}</span>
                                         </div>
-                                    </Link>
-                                ))}
+                                        <div className="h-px w-full bg-slate-100" />
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-slate-500 flex items-center gap-2"><Eye className="w-4 h-4" /> Reach</span>
+                                            <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                                                <div className="w-3 h-3 rounded-full bg-indigo-400" />
+                                            </div>
+                                        </div>
+                                        <div className="h-px w-full bg-slate-100" />
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-slate-500 flex items-center gap-2"><CircleDollarSign className="w-4 h-4" /> Spend</span>
+                                            <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                                                <div className="w-3 h-3 rounded-full bg-indigo-400" />
+                                            </div>
+                                        </div>
+                                        <div className="h-px w-full bg-slate-100" />
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-slate-500 flex items-center gap-2"><Globe2 className="w-4 h-4" /> Countries</span>
+                                            <span className="font-semibold text-slate-900">{ad.country || "-"}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                {/* Page Details */}
+                                <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
+                                    <div className="flex items-center gap-2 mb-6 text-slate-900 font-bold">
+                                        <Store className="w-4 h-4 text-slate-400" />
+                                        Page Details
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center py-2">
+                                        <div className="relative w-32 h-32 rounded-full border-[12px] border-slate-100 flex items-center justify-center">
+                                            <div className="bg-white w-full h-full shadow-inner rounded-full absolute z-10 flex flex-col items-center justify-center">
+                                                <span className="text-2xl font-black text-slate-900">{activeAdsCount}</span>
+                                                <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Active Ads</span>
+                                            </div>
+                                            <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+                                                <circle cx="50%" cy="50%" r="48%" fill="none" stroke="#22c55e" strokeWidth="12" strokeDasharray="100 200" className="z-20 opacity-90" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Shop Details - UNLOCKED */}
+                                <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-2 text-slate-900 font-bold">
+                                            <Store className="w-4 h-4 text-slate-400" />
+                                            Shop Details
+                                        </div>
+                                        <div className="bg-orange-50 text-orange-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-orange-100">
+                                            Unlocked
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                        {/* Simulated Insights */}
+                                        <div>
+                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Monthly Visits</p>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xl font-black text-slate-900">45.2K</span>
+                                                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Platform Details</p>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                <span className="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-slate-200">
+                                                    {ad.platform === 'facebook' || ad.platform === 'instagram' ? 'Shopify' : (ad.platform || 'Shopify')}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Tech Stack</p>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                <span className="bg-indigo-50 text-indigo-700 text-xs font-bold px-2 py-1 rounded-lg border border-indigo-100">
+                                                    Klaviyo
+                                                </span>
+                                                <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded-lg border border-blue-100">
+                                                    Meta Pixel
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
