@@ -130,32 +130,35 @@ async function WinnersDashboard({ storeQuery }: { storeQuery?: string }) {
         </div>
 
         {/* KPI Header */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:ml-9 items-start max-w-2xl">
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-orange-600" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 sm:ml-9 items-start max-w-2xl">
+          <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
             </div>
-            <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Winners</p>
-              <p className="text-2xl font-black text-slate-900">{totalWinners}</p>
-            </div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Nouveautés (7j)</p>
-              <p className="text-2xl font-black text-slate-900">{newThisWeek}</p>
+            <div className="w-full min-w-0">
+              <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">Total Winners</p>
+              <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{totalWinners}</p>
             </div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
-              <Store className="w-5 h-5 text-green-600" />
+          <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
-            <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Top Stores</p>
-              <p className="text-2xl font-black text-slate-900">{uniqueStores}</p>
+            <div className="w-full min-w-0">
+              <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">
+                <span className="sm:hidden">Nouveau</span>
+                <span className="hidden sm:inline">Nouveautés (7j)</span>
+              </p>
+              <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{newThisWeek}</p>
+            </div>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+              <Store className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+            </div>
+            <div className="w-full min-w-0">
+              <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">Top Stores</p>
+              <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{uniqueStores}</p>
             </div>
           </div>
         </div>

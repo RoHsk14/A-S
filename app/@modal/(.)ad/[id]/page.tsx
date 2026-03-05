@@ -44,8 +44,8 @@ export default async function AdModalPage(props: { params: Promise<{ id: string 
         <Modal>
             <div className="flex flex-col lg:flex-row w-full h-full bg-slate-50">
                 {/* LEFT PANE: AD MEDIA & COPY */}
-                <div className="w-full lg:w-[45%] bg-slate-100 p-0 sm:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-200">
-                    <div className="bg-white rounded-none sm:rounded-[24px] shadow-sm border-y sm:border border-slate-200 flex flex-col overflow-hidden">
+                <div className="w-full lg:w-[45%] bg-slate-100 p-4 sm:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-200">
+                    <div className="bg-white rounded-[20px] sm:rounded-[24px] shadow-sm border border-slate-200 flex flex-col overflow-hidden">
                         {/* Header: Store Info */}
                         <div className="p-5 pb-0 flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">

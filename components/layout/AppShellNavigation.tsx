@@ -39,7 +39,7 @@ export function AppShellNavigation({ children, isAuthenticated }: { children: Re
                 </header>
 
                 {/* Page Content */}
-                <div className="flex-1 w-full px-0 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[100px] lg:pb-8">{children}</div>
+                <div className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[100px] lg:pb-8">{children}</div>
 
                 {/* Mobile Bottom Tab Bar */}
                 <MobileTabBar />

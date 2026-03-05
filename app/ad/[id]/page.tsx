@@ -57,12 +57,12 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
                 </Link>
             </div>
 
-            <div className="max-w-6xl mx-auto w-full px-0 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+            <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
 
                     {/* Colonne Gauche: Full Card (Copied from Modal) */}
                     <div className="lg:col-span-5 h-fit lg:sticky top-24 mb-6 lg:mb-0">
-                        <div className="bg-white rounded-none sm:rounded-[24px] shadow-sm border-y sm:border border-slate-200 flex flex-col overflow-hidden">
+                        <div className="bg-white rounded-[20px] sm:rounded-[24px] shadow-sm border border-slate-200 flex flex-col overflow-hidden">
                             {/* Header: Store Info */}
                             <div className="p-5 pb-0 flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
