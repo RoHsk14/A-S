@@ -6,8 +6,12 @@ export function GoogleAuthButton({ isSignUp = false }: { isSignUp?: boolean }) {
     const handleGoogleLogin = async () => {
         const supabase = createClient();
 
-        // Dynamically get the current host from the browser window object
-        const siteUrl = window.location.origin;
+        let siteUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+        if (process.env.NEXT_PUBLIC_SITE_URL) {
+            siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+        } else if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+            siteUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+        }
 
         await supabase.auth.signInWithOAuth({
             provider: 'google',
