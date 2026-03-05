@@ -57,12 +57,12 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
                 </Link>
             </div>
 
-            <div className="max-w-6xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+            <div className="max-w-6xl mx-auto w-full px-0 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
 
                     {/* Colonne Gauche: Full Card (Copied from Modal) */}
-                    <div className="lg:col-span-5 h-fit sticky top-24">
-                        <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                    <div className="lg:col-span-5 h-fit lg:sticky top-24 mb-6 lg:mb-0">
+                        <div className="bg-white rounded-none sm:rounded-[24px] shadow-sm border-y sm:border border-slate-200 flex flex-col overflow-hidden">
                             {/* Header: Store Info */}
                             <div className="p-5 pb-0 flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
@@ -125,7 +125,7 @@ export default async function AdDetailPage(props: { params: Promise<{ id: string
                     </div>
 
                     {/* Colonne Droite: Détails */}
-                    <div className="lg:col-span-7 flex flex-col pt-2 lg:pt-0">
+                    <div className="lg:col-span-7 flex flex-col px-4 sm:px-0 pt-6 lg:pt-0">
                         {/* Actions Principales */}
                         {ad.cta_link && (
                             <div className="mb-6 flex">

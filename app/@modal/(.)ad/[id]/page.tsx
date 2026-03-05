@@ -44,8 +44,8 @@ export default async function AdModalPage(props: { params: Promise<{ id: string 
         <Modal>
             <div className="flex flex-col lg:flex-row w-full h-full bg-slate-50">
                 {/* LEFT PANE: AD MEDIA & COPY */}
-                <div className="w-full lg:w-[45%] bg-slate-100 p-6 sm:p-8 flex flex-col overflow-y-auto border-r border-slate-200 custom-scrollbar">
-                    <div className="bg-white rounded-[24px] shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                <div className="w-full lg:w-[45%] bg-slate-100 p-0 sm:p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-200">
+                    <div className="bg-white rounded-none sm:rounded-[24px] shadow-sm border-y sm:border border-slate-200 flex flex-col overflow-hidden">
                         {/* Header: Store Info */}
                         <div className="p-5 pb-0 flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
@@ -111,10 +111,10 @@ export default async function AdModalPage(props: { params: Promise<{ id: string 
                 </div>
 
                 {/* RIGHT PANE: DATABOARD */}
-                <div className="w-full lg:w-[55%] bg-slate-50 p-6 sm:p-8 flex flex-col overflow-y-auto custom-scrollbar relative">
+                <div className="w-full lg:w-[55%] bg-slate-50 p-4 sm:p-8 pb-24 lg:pb-8 flex flex-col lg:overflow-y-auto custom-scrollbar relative">
 
                     {/* Tabs / Header Actions */}
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 sticky top-0 bg-slate-50 z-20">
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 sticky top-0 pt-4 sm:pt-0 bg-slate-50 z-20">
                         <div className="flex gap-6">
                             <button className="text-orange-600 font-bold border-b-2 border-orange-600 pb-4 -mb-[17px] px-1 flex items-center gap-2">
                                 <LayoutTemplate className="w-4 h-4" /> Overview
