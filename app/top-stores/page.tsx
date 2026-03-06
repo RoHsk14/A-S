@@ -84,8 +84,8 @@ export default async function TopStoresPage() {
                                         #{index + 1}
                                     </div>
 
-                                    {/* Best Ad Visual */}
-                                    <Link href={`/ad/${store.bestAd.id}`} className="relative aspect-[16/9] bg-slate-900 overflow-hidden block">
+                                    {/* Best Ad Visual acts as cover for Store Details */}
+                                    <Link href={`/store/${encodeURIComponent(store.pageName)}`} className="relative aspect-[16/9] bg-slate-900 overflow-hidden block">
                                         {store.bestAd.video_url ? (
                                             <video
                                                 src={store.bestAd.video_url}

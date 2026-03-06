@@ -3,7 +3,7 @@ import { AdWithStore } from "@/types/database";
 import { WinnerGrid } from "@/components/ads/WinnerGrid";
 import { SkeletonCard } from "@/components/ads/SkeletonCard";
 import { createClient } from "@/lib/supabase/server";
-import { TrendingUp, Sparkles, Store, Rocket, ShieldCheck, Zap, ArrowRight } from "lucide-react";
+import { TrendingUp, Sparkles, Store, Rocket, ShieldCheck, Zap, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { CountdownTimer } from "@/components/ads/CountdownTimer";
 
@@ -129,38 +129,66 @@ async function WinnersDashboard({ storeQuery }: { storeQuery?: string }) {
           <CountdownTimer text={`Sélection de la semaine : ${ads.length} pépites`} />
         </div>
 
-        {/* KPI Header */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 sm:ml-9 items-start max-w-2xl">
-          <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
+        {/* KPI & Demo Row */}
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 sm:ml-9 mb-6 items-start w-full max-w-6xl">
+
+          {/* KPI Header */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full lg:w-2/3 max-w-2xl">
+            <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
+              </div>
+              <div className="w-full min-w-0">
+                <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">Total Winners</p>
+                <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{totalWinners}</p>
+              </div>
             </div>
-            <div className="w-full min-w-0">
-              <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">Total Winners</p>
-              <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{totalWinners}</p>
+            <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              </div>
+              <div className="w-full min-w-0">
+                <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">
+                  <span className="sm:hidden">Nouveau</span>
+                  <span className="hidden sm:inline">Nouveautés (7j)</span>
+                </p>
+                <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{newThisWeek}</p>
+              </div>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                <Store className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+              </div>
+              <div className="w-full min-w-0">
+                <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">Top Stores</p>
+                <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{uniqueStores}</p>
+              </div>
             </div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-            </div>
-            <div className="w-full min-w-0">
-              <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">
-                <span className="sm:hidden">Nouveau</span>
-                <span className="hidden sm:inline">Nouveautés (7j)</span>
-              </p>
-              <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{newThisWeek}</p>
-            </div>
+
+          {/* Demo Section */}
+          <div className="w-full lg:w-1/3 flex-shrink-0">
+            {/* Desktop Card */}
+            <a href="https://demo.afrospy.com" target="_blank" rel="noopener noreferrer" className="hidden lg:flex flex-col justify-center h-full bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 text-white shadow-xl hover:-translate-y-1 transition-transform relative overflow-hidden group">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-orange-600 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/10 group-hover:bg-white/20 transition-colors">
+                  <Play className="w-5 h-5 text-orange-400 fill-orange-400 ml-1" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg leading-tight mb-0.5">Voir la démo de la plateforme</h3>
+                  <p className="text-slate-300 text-xs font-medium opacity-80">Découvrez nos fonctionnalités en 2 min</p>
+                </div>
+              </div>
+            </a>
+
+            {/* Mobile Button */}
+            <a href="https://demo.afrospy.com" target="_blank" rel="noopener noreferrer" className="flex lg:hidden w-full items-center justify-center gap-2 bg-slate-900 text-white rounded-xl py-3.5 px-4 font-bold text-sm shadow-md hover:bg-slate-800 transition-colors active:scale-95">
+              <Play className="w-4 h-4 fill-white flex-shrink-0" />
+              Regarder la démo
+            </a>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-4 shadow-sm flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-1.5 sm:gap-4">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-              <Store className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-            </div>
-            <div className="w-full min-w-0">
-              <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider truncate leading-tight">Top Stores</p>
-              <p className="text-lg sm:text-2xl font-black text-slate-900 leading-none mt-0.5">{uniqueStores}</p>
-            </div>
-          </div>
+
         </div>
       </div>
 

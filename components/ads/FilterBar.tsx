@@ -62,7 +62,7 @@ export function FilterBar({ filters, onChange, resultCount }: FilterBarProps) {
             <div className="flex flex-wrap items-center gap-2.5">
 
                 {/* Search */}
-                <div className="relative flex-1 min-w-48">
+                <div className="relative w-full sm:flex-1 sm:min-w-48 sm:w-auto">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                     <input
                         ref={searchRef}
@@ -82,61 +82,64 @@ export function FilterBar({ filters, onChange, resultCount }: FilterBarProps) {
                     )}
                 </div>
 
-                {/* Platform */}
-                <div className="relative">
-                    <select
-                        value={filters.platform}
-                        onChange={(e) => onChange({ ...filters, platform: e.target.value as FilterState["platform"] })}
-                        className="pl-3 pr-7 py-2 bg-charcoal-light border border-charcoal-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-orange-burnt/50 transition-all cursor-pointer appearance-none min-w-40"
-                    >
-                        {PLATFORM_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value} className="bg-charcoal">{opt.label}</option>
-                        ))}
-                    </select>
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown /></div>
-                </div>
+                {/* Mobile Grid for Filters */}
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                    {/* Platform */}
+                    <div className="relative col-span-1">
+                        <select
+                            value={filters.platform}
+                            onChange={(e) => onChange({ ...filters, platform: e.target.value as FilterState["platform"] })}
+                            className="w-full sm:w-auto pl-3 pr-7 py-2 bg-charcoal-light border border-charcoal-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-orange-burnt/50 transition-all cursor-pointer appearance-none min-w-0 sm:min-w-40"
+                        >
+                            {PLATFORM_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value} className="bg-charcoal">{opt.label}</option>
+                            ))}
+                        </select>
+                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown /></div>
+                    </div>
 
-                {/* Lander */}
-                <div className="relative">
-                    <Store className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" />
-                    <select
-                        value={filters.lander}
-                        onChange={(e) => onChange({ ...filters, lander: e.target.value as FilterState["lander"] })}
-                        className="pl-8 pr-7 py-2 bg-charcoal-light border border-charcoal-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-orange-burnt/50 transition-all cursor-pointer appearance-none min-w-36"
-                    >
-                        {LANDER_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value} className="bg-charcoal">{opt.label}</option>
-                        ))}
-                    </select>
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown /></div>
-                </div>
+                    {/* Lander */}
+                    <div className="relative col-span-1">
+                        <Store className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" />
+                        <select
+                            value={filters.lander}
+                            onChange={(e) => onChange({ ...filters, lander: e.target.value as FilterState["lander"] })}
+                            className="w-full sm:w-auto pl-8 pr-7 py-2 bg-charcoal-light border border-charcoal-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-orange-burnt/50 transition-all cursor-pointer appearance-none min-w-0 sm:min-w-36"
+                        >
+                            {LANDER_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value} className="bg-charcoal">{opt.label}</option>
+                            ))}
+                        </select>
+                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown /></div>
+                    </div>
 
-                {/* Age */}
-                <div className="relative">
-                    <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" />
-                    <select
-                        value={filters.age}
-                        onChange={(e) => onChange({ ...filters, age: e.target.value as FilterState["age"] })}
-                        className="pl-8 pr-7 py-2 bg-charcoal-light border border-charcoal-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-orange-burnt/50 transition-all cursor-pointer appearance-none min-w-40"
-                    >
-                        {AGE_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value} className="bg-charcoal">{opt.label}</option>
-                        ))}
-                    </select>
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown /></div>
-                </div>
+                    {/* Age */}
+                    <div className="relative col-span-1">
+                        <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" />
+                        <select
+                            value={filters.age}
+                            onChange={(e) => onChange({ ...filters, age: e.target.value as FilterState["age"] })}
+                            className="w-full sm:w-auto pl-8 pr-7 py-2 bg-charcoal-light border border-charcoal-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-orange-burnt/50 transition-all cursor-pointer appearance-none min-w-0 sm:min-w-40"
+                        >
+                            {AGE_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value} className="bg-charcoal">{opt.label}</option>
+                            ))}
+                        </select>
+                        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown /></div>
+                    </div>
 
-                {/* Active only toggle */}
-                <button
-                    onClick={() => onChange({ ...filters, activeOnly: !filters.activeOnly })}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${filters.activeOnly
-                        ? "bg-green-500/15 border-green-500/30 text-green-400"
-                        : "bg-charcoal-light border-charcoal-border text-text-muted hover:text-text-secondary"
-                        }`}
-                >
-                    <Radio className="w-3.5 h-3.5" />
-                    Live only
-                </button>
+                    {/* Active only toggle */}
+                    <button
+                        onClick={() => onChange({ ...filters, activeOnly: !filters.activeOnly })}
+                        className={`col-span-1 w-full sm:w-auto justify-center sm:justify-start flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${filters.activeOnly
+                            ? "bg-green-500/15 border-green-500/30 text-green-400"
+                            : "bg-charcoal-light border-charcoal-border text-text-muted hover:text-text-secondary"
+                            }`}
+                    >
+                        <Radio className="w-3.5 h-3.5" />
+                        Live only
+                    </button>
+                </div>
 
                 {/* Focus Afrique Toggle */}
                 <button
